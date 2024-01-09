@@ -9,11 +9,9 @@
                    id="questions"
                    class="livesearch rounded-lg hover:bg-slate-100 transition-all bg-slate-300">
                     <div class="ml-2 mr-2">
-                        <p class="text-center text-xs italic pb-1">{{ discussion.belongs_to }} asks:</p>
+                        <p class="text-center text-xs italic pb-1">{{ discussion.belongs_to }} @{{ discussion.created_at }}</p>
                         <h1 class=" text-center text-xl font-semibold">{{ discussion.discussion_question }}</h1>
                         <p id="disc_details_{{ discussion.id }}" class="text-center">{{ discussion.discussion_details }}</p>
-                        <br />
-                        <p class="text-center text-xs italic pb-1">Date: {{ discussion.created_at }}</p>
                     </div>
                 </a>
             {% endfor %}

@@ -12,4 +12,10 @@ def index(request):
         return redirect('home')
 
 def room(request, room_name):
-    return render(request, "room.html", {"room_name": room_name})
+    if request.user.is_authenticated:
+        question = Discussion.objects.get(id=room_name)
+        username = request.user.username
+        return render(request, "room.html", {"room_name": room_name, "question": question, "username": username})
+    else:
+        messages.success(request, "Not Logged In")
+        return redirect('home')

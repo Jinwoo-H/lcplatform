@@ -1,18 +1,30 @@
-<!-- chat/templates/chat/room.html -->
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Chat Room</title>
-    </head>
-    <body>
-        <textarea id="chat-log" cols="100" rows="20" readonly></textarea>
-        <br>
-        <input id="chat-message-input" type="text" size="100">
-        <br>
-        <input id="chat-message-submit" type="button" value="Send">
-        {{ room_name|json_script:"room-name" }}
-        <script>
+{% extends 'base.html' %}
+{% block content %}
+    <div class="min-h-screen flex">
+        <div class="flex-1">
+            <div class="mr-2 p-2 rounded-lg bg-slate-100">
+                <h1 class="text-xl">{{ question.discussion_question }}</h1>
+                <p class="mt-2 italic">By: {{ question.belongs_to }} | Posted at: {{ question.created_at }}</p>
+                <p class="mt-2">{{ question.discussion_details }}</p>
+            </div>
+        </div>
+        <div class="flex-1">
+            <textarea id="chat-log"
+                      cols="100"
+                      rows="18"
+                      readonly
+                      placeholder="Start chat by typing..."
+                      class="p-2 rounded-lg bg-slate-100"></textarea>
+            <br>
+            <input id="chat-message-input" type="text" size="100">
+            <br>
+            <button class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                    id="chat-message-submit"
+                    type="button">Send</button>
+            {{ room_name|json_script:"room-name" }}
+        </div>
+    </div>
+    <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
         const chatSocket = new WebSocket(
@@ -43,10 +55,21 @@
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
             chatSocket.send(JSON.stringify({
-                'message': message
+                'message': '{{ username }}: ' + message
             }));
             messageInputDom.value = '';
         };
-        </script>
-    </body>
-</html>
+
+		//make selecting textarea focus on input box
+		var textarea = document.getElementById('chat-log');
+		textarea.addEventListener('click', function(){
+			var inputbox = document.getElementById('chat-message-input')
+			if (inputbox){
+				inputbox.select();
+				inputbox.focus();
+			}
+		});
+
+    </script>
+    {{ details.notes }}
+{% endblock %}
