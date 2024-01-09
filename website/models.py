@@ -19,4 +19,3 @@ class Question(models.Model):
 class Topic(models.Model):
 	topic_name = models.CharField(max_length=50)
 	belongs_to = models.CharField(max_length=100, blank=True)
-
