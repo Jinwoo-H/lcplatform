@@ -16,7 +16,7 @@ def room(request, room_name):
         question = Discussion.objects.get(id=room_name)
         username = request.user.username
         # get last 20 messages
-        chats = Chat.objects.filter(room=room_name).order_by('timestamp')[:20]
+        chats = reversed(Chat.objects.filter(room=room_name).order_by('-timestamp')[:20])
 
         return render(request, "room.html", {"room_name": room_name, "question": question, "username": username, "chats": chats})
     else:
