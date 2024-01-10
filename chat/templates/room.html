@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="min-h-screen flex">
-        <div class="flex-1">
+    <div class="mt-5 min-h-screen flex">
+        <div class="flex-1 mr-2">
             <div class="mr-2 p-2 rounded-lg bg-slate-100">
                 <h1 class="text-xl">{{ question.discussion_question }}</h1>
                 <p class="mt-2 italic">By: {{ question.belongs_to }} | Posted at: {{ question.created_at }}</p>
                 <p class="mt-2">{{ question.discussion_details }}</p>
             </div>
+            <div class="mt-4 mr-2 p-2 rounded-lg bg-slate-100">
+                <h1 class="text-xl">Comments</h1>
+            </div>
         </div>
         <div class="flex-1">
             <textarea id="chat-log"
-                      cols="100"
-                      rows="18"
                       readonly
+                      rows="18"
                       placeholder="Start chat by typing..."
-                      class="p-2 rounded-lg bg-slate-100"></textarea>
+                      class="p-2 rounded-lg bg-slate-100 w-full"></textarea>
             <br>
-            <input id="chat-message-input" type="text" size="100">
-            <br>
-            <button class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                    id="chat-message-submit"
-                    type="button">Send</button>
+            <div class="flex grid-cols-2">
+                <button class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+                        id="chat-message-submit"
+                        type="button">Send</button>
+                <input id="chat-message-input"
+                       type="text"
+                       placeholder="Message"
+                       class="mt-2 ml-2 bg-slate-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 w-full">
+            </div>
             {{ room_name|json_script:"room-name" }}
         </div>
     </div>
@@ -54,10 +60,14 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': '{{ username }}: ' + message
-            }));
-            messageInputDom.value = '';
+			//only sends if message is not empty
+			if (message){
+				chatSocket.send(JSON.stringify({
+					'message': '{{ username }}: ' + message
+				}));
+				messageInputDom.value = '';
+			}
+      
         };
 
 		//make selecting textarea focus on input box
