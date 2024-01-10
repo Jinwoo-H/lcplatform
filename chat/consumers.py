@@ -2,7 +2,8 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-
+from channels.db import database_sync_to_async
+from .models import Chat
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -22,6 +23,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        
+        chat = Chat(
+               content=message,
+               user=self.scope['user'],
+               room=self.scope["url_route"]["kwargs"]["room_name"]
+		)
+        await database_sync_to_async(chat.save)()
 
         # Send message to room group
         await self.channel_layer.group_send(

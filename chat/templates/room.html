@@ -16,7 +16,7 @@
                       readonly
                       rows="18"
                       placeholder="Start chat by typing..."
-                      class="p-2 rounded-lg bg-slate-100 w-full"></textarea>
+                      class="p-2 rounded-lg bg-slate-100 w-full">{% if chats %}{% for chat in chats %}{{ chat.content }}&#13;&#10;{% endfor %}{% endif %}</textarea>
             <br>
             <div class="flex grid-cols-2">
                 <button class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
@@ -31,8 +31,14 @@
         </div>
     </div>
     <script>
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+		scroller()
+		function scroller(){
+			document.getElementById("chat-log").scrollTop = document.getElementById("chat-log").scrollHeight 
+		};
+		
 
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+		
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -58,6 +64,7 @@
         };
 
         document.querySelector('#chat-message-submit').onclick = function(e) {
+			scroller();
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
 			//only sends if message is not empty
