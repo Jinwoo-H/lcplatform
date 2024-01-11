@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if discussion_questions %}
-        <div class="mt-5 w-6/12  mx-auto grid grid-cols-1 gap-4 h-64"
+        <div class="mt-5 w-6/12  mx-auto grid grid-cols-1 gap-4 h-72"
              id="check-div">
+            <a href="{% url 'add_discussion' %}"
+               class="mt-2 livesearch rounded-lg hover:bg-lime-500 transition-all bg-lime-300 mx-auto w-6/12">
+                <div class="ml-2 mr-2">
+                    <h1 class="text-center text-xl font-semibold pt-2 pb-2">Make a Discussion Post</h1>
+                </div>
+            </a>
             {% for discussion in discussion_questions %}
                 <a href="{% url 'room' discussion.id %}"
                    id="questions"
                    class="mt-2 livesearch rounded-lg hover:bg-slate-100 transition-all bg-white">
                     <div class="ml-2 mr-2">
                         <p class="pt-2 text-xs italic pb-1">{{ discussion.belongs_to }} | {{ discussion.created_at }}</p>
-                        <h1 class=" text-center text-xl font-semibold">{{ discussion.discussion_question }}</h1>
-                        <p id="disc_details_{{ discussion.id }}" class="text-center">{{ discussion.discussion_details }}</p>
+                        <h1 class=" text-center text-xl font-semibold -translate-y-5">{{ discussion.discussion_question }}</h1>
+                        <p id="disc_details_{{ discussion.id }}" class="text-center pb-2">{{ discussion.discussion_details }}</p>
                     </div>
                 </a>
             {% endfor %}

@@ -4,6 +4,9 @@ from django.contrib import messages
 from .models import Question, Topic
 from .forms import AddQuestionForm, SignUpForm
 from django.http import JsonResponse
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
 # Create your views here.
 def home(request):
@@ -104,6 +107,18 @@ def update_question(request, pk):
 			form.instance.difficulty = request.POST.get('difficulty')
 			form.instance.code = request.POST.get('code')
 			form_instance.save()
+			if request.POST.get('button_type') == 'val2':
+				result = gen_notes(request, pk)
+				if result == 1:
+					messages.success(request, "Note Generated")
+					
+				elif result == 0:
+					messages.success(request, "An unexpected error occured. Please try again later")
+				else:
+					messages.success(request, "Note already generated!")
+				return redirect('update_question',pk)
+
+
 			messages.success(request, "Question has been updated")
 			return redirect('home')
 		return render(request, 'update_question.html', {'form': form, 'topics': topics_string, 'question': current_question, 'code': code})
@@ -120,3 +135,64 @@ def remove_question(request, pk):
 	else:
 		messages.success(request, "Could Not Delete Question")
 		return redirect('home')
+
+def gen_notes(request, pk):
+	question = Question.objects.get(id=pk)
+	if not question.generated_notes:
+		try:
+			load_dotenv()
+			key = os.getenv('OPENAI_API_KEY')
+			client = OpenAI(api_key=key)
+			sys_content = "Generate 6 or less bullet points to explain/ make notes for this leetcode question codeblock. Do not add any formatting to the font (i.e no bold or ittalics)"
+			user_content = question.code
+
+			response = client.chat.completions.create(
+				model="gpt-3.5-turbo",
+				messages=[
+					{"role": "system", "content": sys_content},
+					{"role": "user", "content": user_content}
+				]
+			)
+			question.generated_notes = response.choices[0].message.content
+			question.save()
+			return 1
+		except:
+			
+			return 0
+	else:
+		return 2
+
+
+# def generate(request, pk):
+# 	question = Question.objects.get(id=pk)
+# 	if request.user.is_authenticated and question.belongs_to == request.user.username:
+# 		if not question.generated_notes:
+# 			try:
+# 				load_dotenv()
+# 				key = os.getenv('OPENAI_API_KEY')
+# 				client = OpenAI(api_key=key)
+# 				sys_content = "Generate 6 or less bullet points to explain/ make notes for this leetcode question codeblock. Do not add any formatting to the font (i.e no bold or ittalics)"
+# 				user_content = question.code
+
+# 				response = client.chat.completions.create(
+# 					model="gpt-3.5-turbo",
+# 					messages=[
+# 						{"role": "system", "content": sys_content},
+# 						{"role": "user", "content": user_content}
+# 					]
+# 				)
+
+# 				question.generated_notes = response.choices[0].message.content
+# 				question.save()
+# 				messages.success(request, "Note Generated")
+# 				return redirect('home')
+# 			except:
+# 				messages.success(request, "An unexpected error occured. Please try again later")
+# 				return redirect('home')
+
+# 		else:
+# 			messages.success(request, "Note Already Generated!")
+# 			return redirect('home')
+# 	else:	
+# 		messages.success(request, "Not Logged In")
+# 		return redirect('home')
